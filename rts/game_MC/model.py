@@ -9,7 +9,7 @@ import torch.nn as nn
 from copy import deepcopy
 from collections import Counter
 
-from rlpytorch import Model, ActorCritic
+from rlpytorch import Model, ActorCritic, ActorCriticPPO
 from actor_critic_changed import ActorCriticChanged
 from forward_predict import ForwardPredict
 from trunk import MiniRTSNet
@@ -98,6 +98,7 @@ class Model_ActorCritic(Model):
 # if method is None, fall back to default mapping from key to method
 Models = {
     "actor_critic": [Model_ActorCritic, ActorCritic],
+    "actor_critic_ppo": [Model_ActorCritic, ActorCriticPPO],
     "actor_critic_changed": [Model_ActorCritic, ActorCriticChanged],
     "forward_predict": [Model_ActorCritic, ForwardPredict]
 }

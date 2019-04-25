@@ -6,9 +6,11 @@
 
 from .actor_critic import ActorCritic
 from .rnn_actor_critic import RNNActorCritic
+from .actor_critic_ppo import ActorCriticPPO
 from .q_learning import Q_learning
 from .policy_gradient import PolicyGradient
 from .discounted_reward import DiscountedReward
+from .proximal_policy_optimisition import PPO
 from .value_matcher import ValueMatcher
 from .utils import add_err
 

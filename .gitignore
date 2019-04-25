@@ -14,3 +14,5 @@ build
 CMakeFiles
 CMakeCache.txt
 latest?
+.idea/
+.vscode/
