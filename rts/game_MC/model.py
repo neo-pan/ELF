@@ -41,7 +41,7 @@ class Model_ActorCritic(Model):
         self.Wt2 = nn.Linear(linear_in_dim, linear_in_dim)
         self.Wt3 = nn.Linear(linear_in_dim, linear_in_dim)
 
-        self.softmax = nn.Softmax()
+        self.softmax = nn.Softmax(dim=1)
 
     def get_define_args():
         return MiniRTSNet.get_define_args()
