@@ -141,8 +141,8 @@ class PPO:
 
                 # Apply PPO2 algorithm.
                 coeff = pi.data.div(old_pi).gather(1, a.view(-1, 1)).squeeze()
-                surr1 = pg_weights * coeff
-                surr2 = torch.clamp(coeff, 1.0 - args.clip_epsilon, 1.0 + args.clip_epsilon) * pg_weights
+                surr1 = torch.mul(pg_weights, coeff)
+                surr2 = torch.mul(torch.clamp(coeff, 1.0-args.clip_epsilon, 1.0+args.clip_epsilon), pg_weights)
                 pg_weights = torch.min(surr1, surr2)
                 # There is another term (to compensate clamping), but we omit it for now.
 
