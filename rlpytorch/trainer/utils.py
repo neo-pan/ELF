@@ -37,7 +37,7 @@ class ModelSaver:
             define_args = [
                 ("record_dir", "./record"),
                 ("save_prefix", "save"),
-                ("save_dir", dict(type=str, default=os.environ.get("save", "./"))),
+                ("save_dir", dict(type=str, default=os.environ.get("save", "./save"))),
                 ("latest_symlink", "latest"),
             ],
             more_args = ["num_games", "batchsize"],
