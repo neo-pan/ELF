@@ -72,6 +72,13 @@ class Evaluator:
         m.set_volatile(True)
         state_curr = m.forward(batch.hist(0))
         m.set_volatile(False)
+        # try:
+        #     from tensorboardX import SummaryWriter
+        #     import torch
+        #     w = SummaryWriter("./runs/graph")
+        #     w.add_graph(m, input_to_model=torch.rand([128,22,20,20]))
+        # finally:
+        #     pass
 
         if self.sampler is not None:
             reply_msg = self.sampler.sample(state_curr)
@@ -201,7 +208,7 @@ class Trainer:
             self.saver.feed(self.evaluator.mi["model"])
 
         print("Command arguments " + str(args.command_line))
-        self.counter.summary(global_counter=i)
+        self.counter.summary(global_counter=i, n_iter=self.evaluator.mi["model"].step)
         print("")
 
         self.evaluator.episode_summary(i)

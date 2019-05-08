@@ -7,6 +7,7 @@
 from ..args_provider import ArgsProvider
 from collections import defaultdict, deque, Counter
 from datetime import datetime
+from tensorboardX import SummaryWriter
 import os
 
 class SymLink:
@@ -76,14 +77,16 @@ class ValueStats:
         if v < self.min_value:
             self.min_value = v
             self.min_idx = self.counter
-
+            
         self.counter += 1
 
-    def summary(self, info=None):
+    def summary(self, info=None, summary_writer=None, tag=None, n_iter=None):
         info = "" if info is None else info
         name = "" if self.name is None else self.name
         if self.counter > 0:
             try:
+                if summary_writer is not None:
+                    summary_writer.add_scalar(tag, self.summation / self.counter, n_iter)
                 return "%s%s[%d]: avg: %.5f, min: %.5f[%d], max: %.5f[%d]" \
                         % (info, name, self.counter, self.summation / self.counter, self.min_value, self.min_idx, self.max_value, self.max_idx)
             except:
@@ -98,7 +101,6 @@ class ValueStats:
         self.min_value = 1e38
         self.max_idx = None
         self.min_idx = None
-
 
 def topk_accuracy(output, target, topk=(1,)):
     """Computes the precision@k for the specified values of k"""
@@ -122,13 +124,13 @@ class MultiCounter:
         self.counts = Counter()
         self.stats = defaultdict(lambda : ValueStats())
         self.total_count = 0
-
+        self.writer = SummaryWriter()
     def inc(self, key):
         if self.verbose: print("[MultiCounter]: %s" % key)
         self.counts[key] += 1
         self.total_count += 1
 
-    def summary(self, global_counter=None, reset=True):
+    def summary(self, global_counter=None, reset=True, n_iter=None):
         this_time = datetime.now()
         if self.last_time is not None:
             print("[%d] Time spent = %f ms" % (global_counter, (this_time - self.last_time).total_seconds() * 1000))
@@ -139,11 +141,12 @@ class MultiCounter:
 
         for k in sorted(self.stats.keys()):
             v = self.stats[k]
-            print(v.summary(info=str(global_counter) + ":" + k))
+            print(v.summary(info=str(global_counter) + ":" + k), summary_writer=self.writer, tag=k, n_iter=n_iter)
             if reset: v.reset()
 
         if reset:
             self.counts = Counter()
             self.total_count = 0
+            self.writer.close()
 
 
