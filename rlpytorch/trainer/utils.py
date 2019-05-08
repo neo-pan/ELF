@@ -141,7 +141,7 @@ class MultiCounter:
 
         for k in sorted(self.stats.keys()):
             v = self.stats[k]
-            print(v.summary(info=str(global_counter) + ":" + k), summary_writer=self.writer, tag=k, n_iter=n_iter)
+            print(v.summary(info=str(global_counter) + ":" + k, summary_writer=self.writer, tag=k, n_iter=n_iter))
             if reset: v.reset()
 
         if reset:
