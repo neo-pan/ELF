@@ -147,5 +147,3 @@ class MultiCounter:
         if reset:
             self.counts = Counter()
             self.total_count = 0
-
-
