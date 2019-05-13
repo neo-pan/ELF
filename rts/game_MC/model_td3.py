@@ -16,7 +16,7 @@ from trunk import MiniRTSNet
 
 class Model_ActorCritic_TD3(Model):
     def __init__(self, args):
-        super(Model_ActorCritic, self).__init__(args)
+        super(Model_ActorCritic_TD3, self).__init__(args)
         self._init(args)
 
     def _init(self, args):

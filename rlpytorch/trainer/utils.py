@@ -125,6 +125,7 @@ class MultiCounter:
         self.stats = defaultdict(lambda : ValueStats())
         self.total_count = 0
         self.writer = SummaryWriter('./runs/exp1')
+        
     def inc(self, key):
         if self.verbose: print("[MultiCounter]: %s" % key)
         self.counts[key] += 1

@@ -62,7 +62,7 @@ class ActorCriticTD3:
             state_curr = m.forward(bht)
             target = m.target_forward(bht).detach()
             # go through the sample and get the rewards.
-            V = target[value_node].squeeze()
+            V = state_curr[value_node].squeeze()
 
             R = self.discounted_reward.feed(
                 dict(r=batch["r"][t], terminal=batch["terminal"][t]),
