@@ -10,7 +10,7 @@ from .model_loader import ModelLoader, load_env
 from .model_interface import ModelInterface
 
 from .sampler import Sampler
-from .methods import ActorCritic, RNNActorCritic, ActorCriticPPO
+from .methods import ActorCritic, RNNActorCritic, ActorCriticPPO, ActorCriticTD3
 from .runner import EvalIters, SingleProcessRun
 from .trainer import Trainer, Evaluator, LSTMTrainer
 
