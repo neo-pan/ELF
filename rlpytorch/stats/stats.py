@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from ..args_provider import ArgsProvider
+from tensorboardX import SummaryWriter
 
 class EvalCount:
     ''' Eval Count. Run games and record required stats.'''
@@ -58,15 +59,15 @@ class EvalCount:
         #    This should only happen when seq=0
         #    print("id=%s seq=%d, winner=%d" % (id, seq, winner))
 
-    def summary(self):
-        ret = self._summary()
+    def summary(self, n_iter=None):
+        ret = self._summary(n_iter=n_iter)
         self.reset()
         self.num_terminal = 0
         self.summary_count += 1
         return ret
 
-    def print_summary(self):
-        summary = self.summary()
+    def print_summary(self, n_iter=None):
+        summary = self.summary(n_iter=n_iter)
         for k, v in summary.items():
             print("%s: %s" % (str(k), str(v)))
 
@@ -98,7 +99,7 @@ class RewardCount(EvalCount):
     def _on_game(self, id, record, reward, seq=None):
         return record + reward
 
-    def _summary(self):
+    def _summary(self, n_iter=None):
         str_reward = "[%d] Reward: %.2f/%d" % (self.summary_count, float(self.sum_reward) / (self.n + 1e-10), self.n)
         return dict(str_reward=str_reward)
 
@@ -112,6 +113,7 @@ class WinRate(EvalCount):
         self.summary_count = 0
         self.highest_win_rate = -1.0
         self.highest_win_rate_idx = -1
+        self.writer = SummaryWriter('./runs/exp1')
 
     def reset(self):
         self.win_count = 0
@@ -125,7 +127,7 @@ class WinRate(EvalCount):
             self.lose_count += 1
             self.total_lose_count += 1
 
-    def _summary(self):
+    def _summary(self, n_iter=None):
         total = self.win_count + self.lose_count
         win_rate = self.win_count / (total + 1e-10)
         new_record = False
@@ -133,7 +135,8 @@ class WinRate(EvalCount):
             self.highest_win_rate = win_rate
             self.highest_win_rate_idx = self.summary_count
             new_record = True
-
+        if n_iter is not None:
+            self.writer.add_scalar("winrate", win_rate, n_iter)
         str_win_rate = "[%d] Win rate: %.3f [%d/%d/%d], Best win rate: %.3f [%d]" % (self.summary_count, win_rate, self.win_count, self.lose_count, total, self.highest_win_rate, self.highest_win_rate_idx)
 
         total = self.total_win_count + self.total_lose_count
@@ -196,8 +199,8 @@ class Stats(EvalCount):
     def summary(self):
         return self.collector.summary()
 
-    def print_summary(self):
-        self.collector.print_summary()
+    def print_summary(self, n_iter=None):
+        self.collector.print_summary(n_iter=n_iter)
 
     def feed_batch(self, batch, hist_idx=0):
         return self.collector.feed_batch(batch, hist_idx=hist_idx)

@@ -84,9 +84,9 @@ class ValueStats:
         info = "" if info is None else info
         name = "" if self.name is None else self.name
         if self.counter > 0:
+            if summary_writer is not None:
+                summary_writer.add_scalar(tag, self.summation / self.counter, n_iter)
             try:
-                if summary_writer is not None:
-                    summary_writer.add_scalar(tag, self.summation / self.counter, n_iter)
                 return "%s%s[%d]: avg: %.5f, min: %.5f[%d], max: %.5f[%d]" \
                         % (info, name, self.counter, self.summation / self.counter, self.min_value, self.min_idx, self.max_value, self.max_idx)
             except:
@@ -124,7 +124,7 @@ class MultiCounter:
         self.counts = Counter()
         self.stats = defaultdict(lambda : ValueStats())
         self.total_count = 0
-        self.writer = SummaryWriter()
+        self.writer = SummaryWriter('./runs/exp1')
     def inc(self, key):
         if self.verbose: print("[MultiCounter]: %s" % key)
         self.counts[key] += 1

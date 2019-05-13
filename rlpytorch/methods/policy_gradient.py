@@ -141,6 +141,7 @@ class PolicyGradient:
                 # Cap it.
                 coeff = torch.clamp(pi.data.div(old_pi), max=args.ratio_clamp).gather(1, a.view(-1, 1)).squeeze()
                 pg_weights.mul_(coeff)
+                stats["pg_weights"].feed(pg_weights.mean())
                 # There is another term (to compensate clamping), but we omit it for now.
 
             # Compute policy gradient error:

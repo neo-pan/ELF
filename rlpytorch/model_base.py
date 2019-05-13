@@ -63,6 +63,10 @@ class Model(nn.Module):
         ''' Customized operations for each model before update. To be extended. '''
         pass
 
+    def after_update(self):
+        ''' Customized operations for each model after update. To be extended. '''
+        pass
+        
     def save(self, filename, num_trial=10):
         ''' Save current model, step and args to ``filename``
 

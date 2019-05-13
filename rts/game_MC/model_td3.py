@@ -9,13 +9,12 @@ import torch.nn as nn
 from copy import deepcopy
 from collections import Counter
 
-from rlpytorch import Model, ActorCritic, ActorCriticPPO, ActorCriticTD3
+from rlpytorch import Model, ActorCritic, ActorCriticPPO
 from actor_critic_changed import ActorCriticChanged
-from model_td3 import Model_ActorCritic_TD3
 from forward_predict import ForwardPredict
 from trunk import MiniRTSNet
 
-class Model_ActorCritic(Model):
+class Model_ActorCritic_TD3(Model):
     def __init__(self, args):
         super(Model_ActorCritic, self).__init__(args)
         self._init(args)
@@ -25,6 +24,7 @@ class Model_ActorCritic(Model):
         assert isinstance(params["num_action"], int), "num_action has to be a number. action = " + str(params["num_action"])
         self.params = params
         self.net = MiniRTSNet(args)
+        self.target_net=self.net.clone()
         last_num_channel = self.net.num_channels[-1]
 
         if self.params.get("model_no_spatial", False):
@@ -35,6 +35,7 @@ class Model_ActorCritic(Model):
 
         self.linear_policy = nn.Linear(linear_in_dim, params["num_action"])
         self.linear_value = nn.Linear(linear_in_dim, 1)
+        self.target_value = self.linear_value.clone()
 
         self.relu = nn.LeakyReLU(0.1)
 
@@ -58,6 +59,23 @@ class Model_ActorCritic(Model):
             output = self.net(self._var(x["s"]))
 
         return self.decision(output)
+
+    def target_forward(self, x):
+        if self.params.get("model_no_spatial", False):
+            # Replace a complicated network with a simple retraction.
+            # Input: batchsize, channel, height, width
+            xreduced = x["s"].sum(2).sum(3).squeeze()
+            xreduced[:, self.num_unit:] /= 20 * 20
+            output = self._var(xreduced)
+        else:
+            output = self.target_net(self._var(x["s"]))
+        return self.target_decision(output)
+
+    def target_decision(self, h):
+        h = self._var(h)
+        policy = self.softmax(self.linear_policy(h))
+        value = self.target_value(h)
+        return dict(h=h, V=value, pi=policy, action_type=0)
 
     def decision(self, h):
         h = self._var(h)
@@ -95,12 +113,9 @@ class Model_ActorCritic(Model):
         self.Wt2.reset_parameters()
         self.Wt3.reset_parameters()
 
-# Format: key, [model, method]
-# if method is None, fall back to default mapping from key to method
-Models = {
-    "actor_critic": [Model_ActorCritic, ActorCritic],
-    "actor_critic_ppo": [Model_ActorCritic, ActorCriticPPO],
-    "actor_critic_changed": [Model_ActorCritic, ActorCriticChanged],
-    "forward_predict": [Model_ActorCritic, ForwardPredict],
-    "actor_critic_td3": [Model_ActorCritic_TD3, ActorCriticTD3]
-}
+    def after_update(self):
+        tau = 0.05
+        for param, target_param in zip(self.net.parameters(), self.target_net.parameters()):
+            target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
+        for param, target_param in zip(self.linear_value.parameters(), self.target_value.parameters()):
+            target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)

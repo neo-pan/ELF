@@ -97,7 +97,7 @@ class Evaluator:
         self.actor_count += 1
         return reply_msg
 
-    def episode_summary(self, i):
+    def episode_summary(self, i, n_iter=None):
         ''' Called after each episode. Print stats and summary
 
         Args:
@@ -106,7 +106,7 @@ class Evaluator:
         print("[%s] actor count: %d/%d" % (self.name, self.actor_count, self.args.num_minibatch))
 
         if self.stats is not None:
-            self.stats.print_summary()
+            self.stats.print_summary(n_iter=n_iter)
             if self.stats.count_completed() > 10000:
                 self.stats.reset()
 
@@ -211,7 +211,7 @@ class Trainer:
         self.counter.summary(global_counter=i, n_iter=self.evaluator.mi["model"].step)
         print("")
 
-        self.evaluator.episode_summary(i)
+        self.evaluator.episode_summary(i, n_iter=self.evaluator.mi["model"].step)
         self.timer.Restart()
 
     def setup(self, rl_method=None, mi=None, sampler=None):

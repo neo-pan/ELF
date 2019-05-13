@@ -33,6 +33,8 @@ class ModelInterface:
                 ("opt_method", "adam"),
                 ("lr", 1e-3),
                 ("adam_eps", 1e-3),
+                ("soft_update_tau", 0.01),
+                ("use_soft_update", dict(action="store_true")),
             ],
         )
 
@@ -117,7 +119,7 @@ class ModelInterface:
 
         return True
 
-    def update_model(self, key, model, save_old_model=False):
+    def update_model(self, key, model, save_old_model=False, soft_update=False):
         ''' Update an old model. Does not deep copy it.
 
         Args:
@@ -129,7 +131,12 @@ class ModelInterface:
             self.old_models.append(self.models[key].clone().cpu())
             if len(self.old_models) > 20:
                 self.old_models.popleft()
-        self.models[key].load_from(model)
+        if not self.args.use_soft_update:
+            self.models[key].load_from(model)
+        else:
+            for param, target_param in zip(self.models[key].parameters(), model.parameters()):
+                target_param.data.copy_(self.args.soft_update_tau * param.data + \
+                    (1 - self.args.soft_update_tau) * target_param.data)
 
     def average_model(self, key, model):
         ''' Average the model parameters from ``self.models[key]`` and ``model``, and update to ``self.models[key]``.
@@ -169,6 +176,7 @@ class ModelInterface:
             self.models[k].before_update()
             optimizer.step()
             self.models[k].inc_step()
+            self.models[k].after_update()
 
     def __getitem__(self, key):
         ''' Get an item associated with ``key`` from ``self.models``'''
