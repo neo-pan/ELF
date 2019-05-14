@@ -52,15 +52,15 @@ class ActorCriticTD3:
 
         T = batch["s"].size(0)
 
-        state_curr = m.target_forward(batch.hist(T - 1)).detach()
-        self.discounted_reward.setR(state_curr[value_node].squeeze().data, stats)
+        target = m.target_forward(batch.hist(T - 1))
+        self.discounted_reward.setR(target[value_node].squeeze().data, stats)
 
         err = None
 
         for t in range(T - 2, -1, -1):
             bht = batch.hist(t)
             state_curr = m.forward(bht)
-            target = m.target_forward(bht).detach()
+            target = m.target_forward(bht)
             # go through the sample and get the rewards.
             V = state_curr[value_node].squeeze()
 
