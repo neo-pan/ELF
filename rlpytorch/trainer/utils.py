@@ -7,7 +7,8 @@
 from ..args_provider import ArgsProvider
 from collections import defaultdict, deque, Counter
 from datetime import datetime
-import utils.summmary_writer as summary_writer
+import rlpytorch.utils.summary_writer as summary_writer
+
 import os
 
 class SymLink:

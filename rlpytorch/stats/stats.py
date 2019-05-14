@@ -5,7 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from ..args_provider import ArgsProvider
-import utils.summary_writer as summary_writer
+import rlpytorch.utils.summary_writer as summary_writer
 
 class EvalCount:
     ''' Eval Count. Run games and record required stats.'''
