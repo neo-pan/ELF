@@ -35,7 +35,7 @@ class Model_ActorCritic_TD3(Model):
 
         self.linear_policy = nn.Linear(linear_in_dim, params["num_action"])
         self.linear_value = nn.Linear(linear_in_dim, 1)
-        self.target_value = self.linear_value.clone()
+        self.target_value = nn.Linear(linear_in_dim, 1)
 
         self.relu = nn.LeakyReLU(0.1)
 
@@ -61,15 +61,16 @@ class Model_ActorCritic_TD3(Model):
         return self.decision(output)
 
     def target_forward(self, x):
-        if self.params.get("model_no_spatial", False):
-            # Replace a complicated network with a simple retraction.
-            # Input: batchsize, channel, height, width
-            xreduced = x["s"].sum(2).sum(3).squeeze()
-            xreduced[:, self.num_unit:] /= 20 * 20
-            output = self._var(xreduced)
-        else:
-            output = self.target_net(self._var(x["s"]))
-        return self.target_decision(output)
+        with torch.no_grad():
+            if self.params.get("model_no_spatial", False):
+                # Replace a complicated network with a simple retraction.
+                # Input: batchsize, channel, height, width
+                xreduced = x["s"].sum(2).sum(3).squeeze()
+                xreduced[:, self.num_unit:] /= 20 * 20
+                output = self._var(xreduced)
+            else:
+                output = self.target_net(self._var(x["s"]))
+            return self.target_decision(output)
 
     def target_decision(self, h):
         h = self._var(h)
