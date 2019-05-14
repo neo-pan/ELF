@@ -5,7 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 
 from ..args_provider import ArgsProvider
-from tensorboardX import SummaryWriter
 
 class EvalCount:
     ''' Eval Count. Run games and record required stats.'''
@@ -113,7 +112,6 @@ class WinRate(EvalCount):
         self.summary_count = 0
         self.highest_win_rate = -1.0
         self.highest_win_rate_idx = -1
-        self.writer = SummaryWriter('./runs/exp1')
 
     def reset(self):
         self.win_count = 0
@@ -135,8 +133,8 @@ class WinRate(EvalCount):
             self.highest_win_rate = win_rate
             self.highest_win_rate_idx = self.summary_count
             new_record = True
-        if n_iter is not None:
-            self.writer.add_scalar("winrate", win_rate, n_iter)
+        if n_iter is not None and summary_writer is not None:
+            summary_writer.add_scalar("winrate", win_rate, n_iter)
         str_win_rate = "[%d] Win rate: %.3f [%d/%d/%d], Best win rate: %.3f [%d]" % (self.summary_count, win_rate, self.win_count, self.lose_count, total, self.highest_win_rate, self.highest_win_rate_idx)
 
         total = self.total_win_count + self.total_lose_count

@@ -7,7 +7,6 @@
 from ..args_provider import ArgsProvider
 from collections import defaultdict, deque, Counter
 from datetime import datetime
-from tensorboardX import SummaryWriter
 import os
 
 class SymLink:
@@ -80,7 +79,7 @@ class ValueStats:
             
         self.counter += 1
 
-    def summary(self, info=None, summary_writer=None, tag=None, n_iter=None):
+    def summary(self, info=None, tag=None, n_iter=None):
         info = "" if info is None else info
         name = "" if self.name is None else self.name
         if self.counter > 0:
@@ -124,8 +123,7 @@ class MultiCounter:
         self.counts = Counter()
         self.stats = defaultdict(lambda : ValueStats())
         self.total_count = 0
-        self.writer = SummaryWriter('./runs/exp1')
-        
+
     def inc(self, key):
         if self.verbose: print("[MultiCounter]: %s" % key)
         self.counts[key] += 1
@@ -142,7 +140,7 @@ class MultiCounter:
 
         for k in sorted(self.stats.keys()):
             v = self.stats[k]
-            print(v.summary(info=str(global_counter) + ":" + k, summary_writer=self.writer, tag=k, n_iter=n_iter))
+            print(v.summary(info=str(global_counter) + ":" + k, tag=k, n_iter=n_iter))
             if reset: v.reset()
 
         if reset:

@@ -10,7 +10,7 @@
 from datetime import datetime
 import sys
 import os
-
+from from tensorboardX import SummaryWriter
 from rlpytorch import *
 
 if __name__ == '__main__':
@@ -19,7 +19,8 @@ if __name__ == '__main__':
     env, all_args = load_env(os.environ, trainer=trainer, runner=runner)
 
     GC = env["game"].initialize()
-
+    summary_writer = SummaryWriter('/runs/exp3')
+    
     model = env["model_loaders"][0].load_model(GC.params)
     env["mi"].add_model("model", model, opt=True)
     env["mi"].add_model("actor", model, copy=True, cuda=all_args.gpu is not None, gpu_id=all_args.gpu)
