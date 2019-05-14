@@ -19,7 +19,7 @@ if __name__ == '__main__':
     env, all_args = load_env(os.environ, trainer=trainer, runner=runner)
 
     GC = env["game"].initialize()
-    summary_writer = SummaryWriter('/runs/exp3')
+    summary_writer = SummaryWriter('./runs/exp3')
 
     model = env["model_loaders"][0].load_model(GC.params)
     env["mi"].add_model("model", model, opt=True)
