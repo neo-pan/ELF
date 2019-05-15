@@ -24,7 +24,7 @@ class Model_ActorCritic_TD3(Model):
         assert isinstance(params["num_action"], int), "num_action has to be a number. action = " + str(params["num_action"])
         self.params = params
         self.net = MiniRTSNet(args)
-        self.target_net=self.net.clone()
+        # self.target_net=self.net.clone()
         last_num_channel = self.net.num_channels[-1]
 
         if self.params.get("model_no_spatial", False):
@@ -69,7 +69,7 @@ class Model_ActorCritic_TD3(Model):
                 xreduced[:, self.num_unit:] /= 20 * 20
                 output = self._var(xreduced)
             else:
-                output = self.target_net(self._var(x["s"]))
+                output = self.net(self._var(x["s"]))
             return self.target_decision(output)
 
     def target_decision(self, h):
