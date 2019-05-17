@@ -29,7 +29,7 @@ class PPO:
         self.args = ArgsProvider(
             call_from = self,
             define_args = [
-                ("entropy_ratio", dict(type=float, help="The entropy ratio we put on PG", default=0.015)),
+                ("entropy_ratio", dict(type=float, help="The entropy ratio we put on PG", default=0.0125)),
                 ("grad_clip_norm", dict(type=float, help="Gradient norm clipping", default=None)),
                 ("min_prob", dict(type=float, help="Minimal probability used in training", default=1e-6)),
                 ("clip_epsilon", dict(type=float, help="Clip epsilon used in PPO2", default=0.2)),
@@ -143,8 +143,10 @@ class PPO:
                 coeff = pi.data.div(old_pi).gather(1, a.view(-1, 1)).squeeze()
                 surr1 = pg_weights.mul(coeff)
                 surr2 = pg_weights.mul(torch.clamp(coeff, 1.0-args.clip_epsilon, 1.0+args.clip_epsilon))
-                pg_weights = torch.min(surr1, surr2)
+                with torch.no_grad():
+                    pg_weights = torch.min(surr1, surr2)
                 stats["pg_weights"].feed(pg_weights.mean())
+                stats["max_pg_weights"].feed(pg_weights.max())
                 # There is another term (to compensate clamping), but we omit it for now.
 
             # Compute policy gradient error:
