@@ -115,7 +115,7 @@ class Model_ActorCritic_TD3(Model):
         self.Wt3.reset_parameters()
 
     def after_update(self):
-        tau = 1
+        tau = 0.1
         #for param, target_param in zip(self.net.parameters(), self.target_net.parameters()):
         #    target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
         for param, target_param in zip(self.linear_value.parameters(), self.target_value.parameters()):

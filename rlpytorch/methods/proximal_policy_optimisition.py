@@ -30,6 +30,8 @@ class PPO:
             call_from = self,
             define_args = [
                 ("entropy_ratio", dict(type=float, help="The entropy ratio we put on PG", default=0.0125)),
+                ("max_entropy," dict(type=float, help="The max entropy value", default=-1.8)),
+                ("min_entropy," dict(type=float, help="The min entropy value", default=-1.9)),
                 ("grad_clip_norm", dict(type=float, help="Gradient norm clipping", default=None)),
                 ("min_prob", dict(type=float, help="Minimal probability used in training", default=1e-6)),
                 ("clip_epsilon", dict(type=float, help="Clip epsilon used in PPO2", default=0.2)),
@@ -159,7 +161,11 @@ class PPO:
 
             stats["nll_" + pi_node].feed(errs["policy_err"].item())
             stats["entropy_" + pi_node].feed(errs["entropy_err"].item())
-
+            // Auto adjust entropy ratio
+            if errs["entropy_err"].item() > args.max_entropy:
+                self.args.entropy_ratio *= 1.25
+            elif errs["entropy_err"].item() < args.min_entropy:
+                self.args.entropy_ratio /= 1.25
         for log_pi in log_pi_s:
             self._reg_backward(log_pi, Variable(pg_weights))
 
