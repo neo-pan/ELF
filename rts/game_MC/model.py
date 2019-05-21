@@ -42,7 +42,7 @@ class Model_ActorCritic(Model):
         self.Wt2 = nn.Linear(linear_in_dim, linear_in_dim)
         self.Wt3 = nn.Linear(linear_in_dim, linear_in_dim)
 
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = nn.LogSoftmax(dim=1)
 
     def get_define_args():
         return MiniRTSNet.get_define_args()
@@ -61,9 +61,9 @@ class Model_ActorCritic(Model):
 
     def decision(self, h):
         h = self._var(h)
-        policy = self.softmax(self.linear_policy(h))
+        log_policy = self.softmax(self.linear_policy(h))
         value = self.linear_value(h)
-        return dict(h=h, V=value, pi=policy, action_type=0)
+        return dict(h=h, V=value, pi=log_policy.exp(), action_type=0)
 
     def decision_fix_weight(self, h):
         # Copy linear policy and linear value
