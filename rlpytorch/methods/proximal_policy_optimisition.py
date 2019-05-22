@@ -29,9 +29,9 @@ class PPO:
         self.args = ArgsProvider(
             call_from = self,
             define_args = [
-                ("entropy_ratio", dict(type=float, help="The entropy ratio we put on PG", default=0.0125)),
+                ("entropy_ratio", dict(type=float, help="The entropy ratio we put on PG", default=0.01)),
                 ("max_entropy", dict(type=float, help="The max entropy value", default=-1.8)),
-                ("min_entropy", dict(type=float, help="The min entropy value", default=-1.9)),
+                ("min_entropy", dict(type=float, help="The min entropy value", default=-2.2)),
                 ("grad_clip_norm", dict(type=float, help="Gradient norm clipping", default=None)),
                 ("min_prob", dict(type=float, help="Minimal probability used in training", default=1e-6)),
                 ("clip_epsilon", dict(type=float, help="Clip epsilon used in PPO2", default=0.2)),
