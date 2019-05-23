@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import math
-import scipy
+import scipy.signal
 from collections import deque
 from ..args_provider import ArgsProvider
 
