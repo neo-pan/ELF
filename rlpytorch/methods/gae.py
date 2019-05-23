@@ -20,8 +20,8 @@ class GAE:
         self.args = ArgsProvider(
             call_from = self,
             define_args = [
-                ("discount", dict(type=float, default=0.99)),
-                ("lambda", dict(type=float, default=0.95)),
+                ("GAMMA", dict(type=float, default=0.99)),
+                ("LAMBDA", dict(type=float, default=0.95)),
             ],
         )
         self.buffer_r = deque()
@@ -58,8 +58,8 @@ class GAE:
         self.buffer_terminal.appendleft(term)
 
         advantage = self.discount(
-            np.asarray(self.buffer_r) + self.args.gamma * np.asarray(self.buffer_v)[1:] * (1-np.asarray(self.buffer_terminal)[1:])\
-            -np.asarray(self.buffer_v)[:-1], self.args.gamma*self.args.lambda
+            np.asarray(self.buffer_r) + self.args.GAMMA * np.asarray(self.buffer_v)[1:] * (1-np.asarray(self.buffer_terminal)[1:])\
+            -np.asarray(self.buffer_v)[:-1], self.args.GAMMA*self.args.LAMBDA
         )
 
         return torch.tensor(advantage + np.asarray(self.buffer_v)[:-1])
