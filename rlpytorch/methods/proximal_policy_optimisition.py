@@ -49,7 +49,7 @@ class PPO:
             policy, action = node.split(",")
             self.policy_action_nodes.append((policy, action))
 
-    def _compute_one_policy_entropy_err(self, logpi, pi, a):
+    def _compute_one_policy_entropy_err(self, pi, a):
         '''Compute policy error and entropy error for one. Pass in ``args.min_prob`` to avoid ``Nan`` in logrithms.
 
         Returns:
@@ -61,7 +61,7 @@ class PPO:
         batchsize = a.size(0)
 
         # Add normalization constant
-        # logpi = (pi + self.args.min_prob).log()
+        logpi = (pi + self.args.min_prob).log()
         # TODO Seems that logpi.clone() won't create a few hook list.
         # See https://github.com/pytorch/pytorch/issues/2601
         logpi2 = (pi + self.args.min_prob).log()
@@ -71,7 +71,7 @@ class PPO:
         entropy_err = (logpi2 * pi).sum() / batchsize
         return dict(logpi=logpi, policy_err=policy_err, entropy_err=entropy_err)
 
-    def _compute_policy_entropy_err(self, logpi, pi, a):
+    def _compute_policy_entropy_err(self, pi, a):
         '''Compute policy error and entropy error for a batch. Pass in ``args.min_prob`` to avoid ``Nan`` in logrithms.
 
         Returns:
@@ -89,7 +89,7 @@ class PPO:
                 for j, pixy in enumerate(pix):
                     errs = accumulate(errs, self._compute_one_policy_entropy_err(pixy, a[:,i,j], args.min_prob))
         else:
-            errs = self._compute_one_policy_entropy_err(logpi, pi, a)
+            errs = self._compute_one_policy_entropy_err(pi, a)
 
         return errs
 
@@ -136,7 +136,6 @@ class PPO:
 
         for pi_node, a_node in self.policy_action_nodes:
             pi = pi_s[pi_node]
-            logpi = pi_s["logpi"]
             a = actions[a_node].squeeze()
 
             if pi_node in old_pi_s:
@@ -155,7 +154,7 @@ class PPO:
                 # There is another term (to compensate clamping), but we omit it for now.
 
             # Compute policy gradient error:
-            errs = self._compute_policy_entropy_err(logpi, pi, Variable(a))
+            errs = self._compute_policy_entropy_err(pi, Variable(a))
             policy_err = add_err(policy_err, errs["policy_err"])
             entropy_err = add_err(entropy_err, errs["entropy_err"])
             log_pi_s.append(errs["logpi"])
