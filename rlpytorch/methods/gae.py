@@ -26,7 +26,8 @@ class GAE:
         )
         self.buffer_r = deque()
         self.buffer_v = deque()
-        self.buffer_terminal = deque(0)
+        self.buffer_terminal = deque()
+        self.buffer_terminal.append(0)
         
     @staticmethod
     def discount(x, gamma):
