@@ -61,9 +61,10 @@ class Model_ActorCritic(Model):
 
     def decision(self, h):
         h = self._var(h)
-        log_policy = self.softmax(self.linear_policy(h))
+        log_pi = self.softmax(self.linear_policy(h))
+        pi = logpi.exp()
         value = self.linear_value(h)
-        return dict(h=h, V=value, logpi=log_policy, pi=torch.exp(log_policy), action_type=0)
+        return dict(h=h, V=value, logpi=logpi, pi=pi, action_type=0)
 
     def decision_fix_weight(self, h):
         # Copy linear policy and linear value
