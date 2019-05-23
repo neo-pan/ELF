@@ -63,6 +63,8 @@ class Model_ActorCritic(Model):
         h = self._var(h)
         logpi = self.softmax(self.linear_policy(h))
         pi = logpi.exp()
+        if pi.sum() != 1.0:
+            pi.div_(pi.sum())
         value = self.linear_value(h)
         return dict(h=h, V=value, logpi=logpi, pi=pi, action_type=0)
 
