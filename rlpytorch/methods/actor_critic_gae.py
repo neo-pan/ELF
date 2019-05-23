@@ -65,7 +65,7 @@ class ActorCriticGAE:
             V = state_curr[value_node].squeeze()
 
             R = self.discounted_reward.feed(
-                dict(r=batch["r"][t], terminal=batch["terminal"][t]),
+                dict(r=batch["r"][t], terminal=batch["terminal"][t], V=V),
                 stats=stats)
 
             policy_err = self.pg.feed(R-V.data, state_curr, bht, stats, old_pi_s=bht)

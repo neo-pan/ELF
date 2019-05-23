@@ -53,7 +53,7 @@ class GAE:
         '''
         r = batch["r"]
         term = batch["terminal"]
-        v = batch[self.args.value_node]
+        v = batch["V"]
         
         self.buffer_r.appendleft(r)
         self.buffer_v.appendleft(v)
