@@ -22,6 +22,7 @@ class GAE:
             define_args = [
                 ("GAMMA", dict(type=float, default=0.99)),
                 ("LAMBDA", dict(type=float, default=0.95)),
+                ("value_node"),
             ],
         )
         self.buffer_r = deque()
@@ -52,7 +53,7 @@ class GAE:
         '''
         r = batch["r"]
         term = batch["terminal"]
-        v = batch["V"]
+        v = batch[self.args.value_node]
         
         self.buffer_r.appendleft(r)
         self.buffer_v.appendleft(v)
