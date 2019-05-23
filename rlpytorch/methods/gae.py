@@ -22,8 +22,8 @@ class GAE:
             define_args = [
                 ("GAMMA", dict(type=float, default=0.99)),
                 ("LAMBDA", dict(type=float, default=0.95)),
-                ("value_node"),
             ],
+            more_args = ["value_node"],
         )
         self.buffer_r = deque()
         self.buffer_v = deque()
