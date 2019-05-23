@@ -63,8 +63,7 @@ class Model_ActorCritic(Model):
         h = self._var(h)
         logpi = self.softmax(self.linear_policy(h))
         pi = logpi.exp()
-        if pi.sum() != 1.0:
-            pi = pi.div(pi.sum())
+        pi = torch.where(pi<0, 0, pi)
         value = self.linear_value(h)
         return dict(h=h, V=value, logpi=logpi, pi=pi, action_type=0)
 
