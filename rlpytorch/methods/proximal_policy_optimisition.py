@@ -163,9 +163,9 @@ class PPO:
             stats["entropy_" + pi_node].feed(errs["entropy_err"].item())
             # Auto adjust entropy ratio:
             if errs["entropy_err"].item() > args.max_entropy:
-                self.args.entropy_ratio *= 1.25
+                self.args.entropy_ratio = 0.01+0.01*(errs["entropy_err"].item()-args.max_entropy)
             elif errs["entropy_err"].item() < args.min_entropy:
-                self.args.entropy_ratio /= 1.25
+                self.args.entropy_ratio = 0.01
         for log_pi in log_pi_s:
             self._reg_backward(log_pi, Variable(pg_weights))
 
