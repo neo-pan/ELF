@@ -36,7 +36,7 @@ class GAE:
 
     def setR(self, R, stats):
         ''' Set rewards and feed to stats'''
-        self.buffer_v.appendleft(R.numpy())
+        self.buffer_v.appendleft(R.cpu().numpy())
         stats["init_reward"].feed(R.mean())
 
     def feed(self, batch, stats):
@@ -55,9 +55,9 @@ class GAE:
         term = batch["terminal"]
         v = batch["V"]
         
-        self.buffer_r.appendleft(r.numpy())
-        self.buffer_v.appendleft(v.numpy())
-        self.buffer_terminal.appendleft(term.numpy())
+        self.buffer_r.appendleft(r.cpu().numpy())
+        self.buffer_v.appendleft(v.cpu().numpy())
+        self.buffer_terminal.appendleft(term.cpu().numpy())
 
         advantage = self.discount(
             np.asarray(self.buffer_r) + self.args.GAMMA * np.asarray(self.buffer_v)[1:] * (1-np.asarray(self.buffer_terminal)[1:])\
