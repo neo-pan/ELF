@@ -9,7 +9,7 @@ import torch.nn as nn
 from copy import deepcopy
 from collections import Counter
 
-from rlpytorch import Model, ActorCritic, ActorCriticPPO, ActorCriticTD3
+from rlpytorch import Model, ActorCritic, ActorCriticPPO, ActorCriticTD3, ActorCriticGAE
 from actor_critic_changed import ActorCriticChanged
 from model_td3 import Model_ActorCritic_TD3
 from forward_predict import ForwardPredict
@@ -102,5 +102,6 @@ Models = {
     "actor_critic_ppo": [Model_ActorCritic, ActorCriticPPO],
     "actor_critic_changed": [Model_ActorCritic, ActorCriticChanged],
     "forward_predict": [Model_ActorCritic, ForwardPredict],
-    "actor_critic_td3": [Model_ActorCritic_TD3, ActorCriticTD3]
+    "actor_critic_td3": [Model_ActorCritic_TD3, ActorCriticTD3],
+    "actor_critic_gae": [Model_ActorCritic, ActorCriticGAE]
 }
