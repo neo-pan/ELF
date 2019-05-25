@@ -161,11 +161,12 @@ class PPO:
 
             stats["nll_" + pi_node].feed(errs["policy_err"].item())
             stats["entropy_" + pi_node].feed(errs["entropy_err"].item())
-            # Auto adjust entropy ratio:
-            if errs["entropy_err"].item() > args.max_entropy:
-                self.args.entropy_ratio = 0.01+0.01*(errs["entropy_err"].item()-args.max_entropy)
-            elif errs["entropy_err"].item() < args.min_entropy:
-                self.args.entropy_ratio = 0.01
+        # Auto adjust entropy ratio:
+        if errs["entropy_err"].item() > args.max_entropy:
+            self.args.entropy_ratio = 0.01+0.01*(errs["entropy_err"].item()-args.max_entropy)
+        elif errs["entropy_err"].item() < args.min_entropy:
+            self.args.entropy_ratio = 0.01
+        stats["entropy_ratio"] = feed.(self.args.entropy_ratio)
         for log_pi in log_pi_s:
             self._reg_backward(log_pi, Variable(pg_weights))
 
@@ -173,4 +174,4 @@ class PPO:
             stats["total_nll"].feed(policy_err.item())
             stats["total_entropy"].feed(entropy_err.item())
 
-        return policy_err + entropy_err * args.entropy_ratio
+        return policy_err + entropy_err * self.args.entropy_ratio
